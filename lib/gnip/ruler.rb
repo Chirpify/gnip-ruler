@@ -1,4 +1,6 @@
 require "gnip/ruler/version"
+require "gnip/ruler/utility"
+require "gnip/ruler/request"
 require "gnip/ruler/ruler"
 require "gnip/ruler/add"
 require "gnip/ruler/delete"

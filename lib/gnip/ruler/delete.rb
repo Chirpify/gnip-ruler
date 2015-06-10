@@ -7,14 +7,13 @@ module Gnip
     # @param (String) JSON-ified string of Gnip rules to add to current ruleset
     # @return boolean
     #
-    def delete(arg = delete_rules_json)
-      # check if the rules set is empty, if so, return true, nothing to do.
-      return true if delete_rules == []
+    def make_delete_request(arg)
+      rules = "{ \"rules\": #{arg} }"
       begin
-          response = request_delete(arg)
+          response = request_delete(rules)
       rescue
           sleep 5
-          response = request_delete(arg)
+          response = request_delete(rules)
       end
 
       return true if response.code == "200"

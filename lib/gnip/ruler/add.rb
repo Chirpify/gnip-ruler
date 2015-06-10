@@ -5,16 +5,14 @@ module Gnip
     # @param (String) JSON-ified string of Gnip rules to add to current ruleset
     # @return boolean
     #
-    def add(arg = rules_json)
-      # check if the rules set is empty, if so, return true, nothing to do.
-      return true if rules == []
-
+    def make_add_request(arg)
       # Attempt to update the Gnip rule set
+      rules = "{ \"rules\": #{arg} }"
       begin
-          response = request_post(arg)
+        response = request_post(rules)
       rescue
-          sleep 5
-          response = request_post(arg)
+        sleep 5
+        response = request_post(rules)
       end
       return true if response.code == "201"
       false
