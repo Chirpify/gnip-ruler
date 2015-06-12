@@ -6,8 +6,8 @@ require 'gnip/ruler/version'
 Gem::Specification.new do |spec|
   spec.name          = "gnip-ruler"
   spec.version       = Gnip::Ruler::VERSION
-  spec.authors       = ["todgru"]
-  spec.email         = ["todgru@gmail.com"]
+  spec.authors       = ["Chirpify"]
+  spec.email         = ["todd@chirpify.com"]
 
   spec.summary       = %q{Add, delete and list Gnip rules.}
   spec.description   = %q{The Gnip Ruler: Add, delete and list Gnip rules using Ruby.}

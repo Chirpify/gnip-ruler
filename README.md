@@ -1,12 +1,12 @@
 # Gnip::Ruler
 
 ```
-   ____       _         ____        _           
-  / ___|_ __ (_)_ __   |  _ \ _   _| | ___ _ __ 
+   ____       _         ____        _
+  / ___|_ __ (_)_ __   |  _ \ _   _| | ___ _ __
  | |  _| '_ \| | '_ \  | |_) | | | | |/ _ \ '__|
- | |_| | | | | | |_) | |  _ <| |_| | |  __/ |   
-  \____|_| |_|_| .__/  |_| \_\\__,_|_|\___|_|   
-               |_|                              
+ | |_| | | | | | |_) | |  _ <| |_| | |  __/ |
+  \____|_| |_|_| .__/  |_| \_\\__,_|_|\___|_|
+               |_|
 ```
 
 ## Installation
@@ -14,7 +14,7 @@
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'gnip-rules'
+gem 'gnip-ruler'
 ```
 
 And then execute:
@@ -23,7 +23,7 @@ And then execute:
 
 Or install it yourself as:
 
-    $ gem install gnip-rules
+    $ gem install gnip-ruler
 
 ## Usage
 
@@ -97,7 +97,7 @@ $ gem build gnip-ruler.gemspec
 
 ## Contributing
 
-1. Fork it ( https://github.com/[my-github-username]/gnip-rules/fork )
+1. Fork it ( https://github.com/chirpify/gnip-ruler/fork )
 2. Create your feature branch (`git checkout -b my-new-feature`)
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)

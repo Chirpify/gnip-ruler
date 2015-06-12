@@ -31,11 +31,31 @@ end
 # Both expressions match "apple ipad" or "iphone ipad"
 #
 #
+# @todo
+# Ideally this gem should work like this:
+# # for hashtags:
+# ruler.new url, pass, username
+# ruler.hashtag('foo')
+# ruler.hashtag('bar')
+# ruler.tag('this is a tag')
+# # add optional location
+# ruler.location.lat('123')
+# ruler.location.lon('45')
+# ruler.location.rad('0.01')
+# # add rule to batch(adds to master queue array!)
+# ruler.batch
+# # produces rule: {'value':'#bar #foo point_radius:[123 45 0.01]', 'tag':'this is a tag'}
+# # go again
+# # ...
+# # send queued rules to Gnip
+# ruler.add
+#
+#
 module Gnip
   class Ruler
 
     attr :url, :username, :password
-    attr_reader :uri, :rules, :delete_rules
+    attr_reader :uri, :rules, :delete_rules, :current_rules_list
 
     def initialize (url, username, password)
       @url ||= url
@@ -58,7 +78,9 @@ module Gnip
       # if no hashtags, return
       return if arg['value'].nil?
 
-      # produce alphabetic hashtag group
+      # produce alphabetic hashtag group and format
+      # @todo remove formatting till last
+      #
       temp = ''
       arg['value'].sort_by{|h| h.downcase}.each {|h| temp << "##{h.downcase} " }
 
@@ -109,7 +131,7 @@ module Gnip
       temp = ''
       arg['value'].sort_by{|h| h.downcase}.each {|h| temp << "##{h.downcase} " }
 
-      # rule to delete 
+      # rule to delete
       delete_rule = { "value" => temp[0...-1] }
       # append delete rule to list of delete rules
       delete_rules << delete_rule
@@ -128,6 +150,13 @@ module Gnip
       @delete_rules ||= []
     end
 
+    # Makes call to Gnip to determine the current rules we are tracking. Sets
+    # the rules list for this instance.
+    #
+    def current_rules_list
+      @current_rules_list ||= list
+    end
+
     private
 
     # Checks if the new rule has already been added to the current rule set or
@@ -135,7 +164,7 @@ module Gnip
     #
     def rule_exists(new_rule)
       return true if rules.any?{|h| h == new_rule }
-      return true if current_rule.any?{|h| h == new_rule }
+      return true if current_rules_list.any?{|h| h == new_rule }
       false
     end
 
@@ -152,11 +181,10 @@ module Gnip
       }.to_json
     end
 
-    # Makes call to Gnip to determine the current rules we are tracking.
+    # Rules hashtag formater
     #
-    def current_rule
-      return [] if list.nil?
-      list['rules']
+    def hashtag_format( hash )
+      # hash.each{ |k| ...add hash...}
     end
 
     #
