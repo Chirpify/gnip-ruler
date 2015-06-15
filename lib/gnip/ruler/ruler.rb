@@ -2,10 +2,6 @@ require "net/https"
 require "uri"
 require "json"
 
-def json(arg)
-  JSON.parse(arg)
-end
-
 # Gnip Rules API Connection and Formatter
 #
 # Tag notes:
@@ -31,8 +27,7 @@ end
 # Both expressions match "apple ipad" or "iphone ipad"
 #
 #
-# @todo
-# Ideally this gem should work like this:
+# Example:
 # # for hashtags:
 # ruler.new url, pass, username
 # ruler.hashtag('foo')
@@ -50,91 +45,86 @@ end
 # # send queued rules to Gnip
 # ruler.add
 #
+# # delete hashtag
+# ruler.new url, pass, username
+# ruler.hashtag('foo')
+# ruler.hashtag('bar')
+# ruler.batch
+# ruler.delete
+#
 #
 module Gnip
   class Ruler
 
-    attr :url, :username, :password
-    attr_reader :uri, :rules, :delete_rules, :current_rules_list
+    include Gnip::Request
+
+    attr_reader :uri, :url, :password, :username
+    attr_reader :hashtags, :batch, :locations, :lat, :long, :radius, :tag, :batch
 
     def initialize (url, username, password)
-      @url ||= url
-      @username ||= username
-      @password ||= password
+      @uri = URI.parse(url)
+      @username = username
+      @password = password
+      @batch = []
+      set_rule_vars
     end
 
-    def generate_rule_set( rules = [] )
-      current_rule_set
+    def hashtag( arg )
+      @hashtags << arg
+      self
     end
 
-    # Idempotent adding of hashtags to track in the Gnip Rules set.
+    # Add location data to the rule
     #
-    # {
-    #   value => ['foo', 'bar'],
-    #   tag = > 'mytag'
-    # }
-    #
-    def hashtag( arg = {} )
-      # if no hashtags, return
-      return if arg['value'].nil?
-
-      # produce alphabetic hashtag group and format
-      # @todo remove formatting till last
-      #
-      temp = ''
-      arg['value'].sort_by{|h| h.downcase}.each {|h| temp << "##{h.downcase} " }
-
-      # new rule, set tag if it exists
-      new_rule = { "value" => temp[0...-1], "tag" => arg['tag'] || nil }
-
-      # append new rule if it doesn't already exist
-      rules << new_rule unless rule_exists(new_rule)
+    def location
+      self
+    end
+    
+    def lat(arg)
+      @lat = arg.to_f
+      self
     end
 
-    # Takes an Array of hashes to produced hashtag-based-on-location results
-    #
-    # # lat decimal
-    # # long decimal
-    # # radius is miles
-    # # hashtags array of strings
-    #
-    # Example:
-    # {
-    #   lat => '45.5192172',
-    #   long => '-122.6755683',
-    #   radius => 0.1,
-    #   hashtags => [ 'foo', 'bar' ]
-    # }
-    #
-    # @TODO todd@chirpify.com
-    #
-    def hashtag_location (arg = {})
-      #point_radius:[lon lat radius]
-      # produce:
-      # "#foo #bar point_radius:[45.5192172 -122.6755683 0.1]"
+    def lon(arg)
+      @lon = arg.to_f
+      self
     end
 
-    # Delete hashtags from the Gnip Rule set
+    # Miles
     #
-    # Similar to adding hashtag, but optional tag ignored.
-    #
-    # Example:
-    # {
-    #   value => ['foo', 'bar'],
-    # }
-    #
-    def delete_hashtag(arg = {})
-      # if no hashtags, return
-      return if arg['value'].nil?
+    def radius(arg)
+      @radius = arg.to_f
+      self
+    end
 
-      # produce alphabetical hashtag group
-      temp = ''
-      arg['value'].sort_by{|h| h.downcase}.each {|h| temp << "##{h.downcase} " }
+    # Add tag to gnip rule
+    #
+    def tag(arg)
+      @tag = arg.to_s
+      self
+    end
 
-      # rule to delete
-      delete_rule = { "value" => temp[0...-1] }
-      # append delete rule to list of delete rules
-      delete_rules << delete_rule
+    # Generate the entire Gnip rule string for this instance.  Add rule to
+    # batch.  Reset Gnip rule vars in preparation for next rule addition.
+    #
+    def batch
+      # Add location rule, if set 
+      @batch << { 'value' => hashtags_format_gnip << location_format_gnip, 'tag' => @tag }
+      # Reset gnip rule vars to defaults
+      set_rule_vars
+      @batch
+    end
+
+    # Send entire Gnip rule string (@batch) to Gnip
+    #
+    def add
+      make_add_request({ 'rules' => @batch }.to_json)
+    end
+
+    # Send entire Gnip rule string (@batch) to Gnip
+    #
+    def delete
+      make_delete_request({ 'rules' => @batch }.to_json)
     end
 
     #
@@ -142,88 +132,35 @@ module Gnip
     def delete_hashtag_location(arg = {})
     end
 
-    def rules
-      @rules ||= []
-    end
-
-    def delete_rules
-      @delete_rules ||= []
-    end
-
-    # Makes call to Gnip to determine the current rules we are tracking. Sets
-    # the rules list for this instance.
-    #
-    def current_rules_list
-      @current_rules_list ||= list
-    end
-
     private
 
-    # Checks if the new rule has already been added to the current rule set or
-    # exists in the current Gnip rule set. If either is true, this returns true.
+    # Generate hashtags string for the Gnip rules
     #
-    def rule_exists(new_rule)
-      return true if rules.any?{|h| h == new_rule }
-      return true if current_rules_list.any?{|h| h == new_rule }
-      false
+    def hashtags_format_gnip
+      gnip_rule = ''
+      @hashtags.uniq.sort_by{|h| h.downcase}.each{|h| gnip_rule << "##{h.downcase} " }
+      gnip_rule
     end
 
-    # Format the rules and JSON-ify the rules for the Gnip POST body
+    # Generate location string for Gnip rules if lat, lon, and radius are set
+    # else return empty string
     #
-    def rules_json
-      {
-        'rules' => rules
-      }.to_json
+    def location_format_gnip
+      unless @lat.nil? || @lon.nil? || @radius.nil?
+        "point_radius:[#{@lat} #{@lon} #{@radius}]" 
+      else
+        ''
+      end
     end
-    def delete_rules_json
-      {
-        'rules' => delete_rules
-      }.to_json
-    end
-
-    # Rules hashtag formater
-    #
-    def hashtag_format( hash )
-      # hash.each{ |k| ...add hash...}
-    end
-
-    #
-    ## Request Based code - this could be moved out its own Module/Class ##
-    #
-    def uri
-      @uri ||= URI.parse(url)
-    end
-
-    def http
-      h = Net::HTTP.new(uri.host, uri.port)
-      h.use_ssl = true
-      h
-    end
-
-    # Make a GET request to the Gnip Rules API
-    #
-    def request_get
-      get = Net::HTTP::Get.new(uri.request_uri)
-      get.basic_auth(username, password)
-      http.request(get)
-    end
-
-    # Make a POST request to the Gnip Rules API
-    #
-    def request_post(json_rules)
-      post = Net::HTTP::Post.new(uri.path)
-      post.body = json_rules
-      post.basic_auth(username, password)
-      http.request(post)
-    end
-
-    # Make a DELETE request to the Gnip Rules API
-    #
-    def request_delete(json_rules)
-      delete = Net::HTTP::Delete.new(uri.path)
-      delete.body = json_rules
-      delete.basic_auth(username, password)
-      http.request(delete)
+    
+    # Set Gnip rule variables to nil
+    def set_rule_vars
+      # reset rule vars to nil 
+      @hashtags = []
+      @lat = nil
+      @lon = nil
+      @radius = nil
+      @tag = nil
     end
 
   end
