@@ -59,7 +59,7 @@ module Gnip
     include Gnip::Request
 
     attr_reader :uri, :url, :password, :username
-    attr_reader :hashtags, :batch, :locations, :lat, :long, :radius, :tag, :batch
+    attr_reader :hashtags, :batch, :locations, :lat, :long, :radius, :tag
 
     def initialize (url, username, password)
       @uri = URI.parse(url)
@@ -79,7 +79,7 @@ module Gnip
     def location
       self
     end
-    
+
     def lat(arg)
       @lat = arg.to_f
       self
@@ -108,7 +108,7 @@ module Gnip
     # batch.  Reset Gnip rule vars in preparation for next rule addition.
     #
     def batch
-      # Add location rule, if set 
+      # Add location rule, if set
       @batch << { 'value' => hashtags_format_gnip << location_format_gnip, 'tag' => @tag }
       # Reset gnip rule vars to defaults
       set_rule_vars
@@ -139,7 +139,7 @@ module Gnip
     def hashtags_format_gnip
       gnip_rule = ''
       @hashtags.uniq.sort_by{|h| h.downcase}.each{|h| gnip_rule << "##{h.downcase} " }
-      gnip_rule
+      gnip_rule[0...-1]
     end
 
     # Generate location string for Gnip rules if lat, lon, and radius are set
@@ -147,15 +147,18 @@ module Gnip
     #
     def location_format_gnip
       unless @lat.nil? || @lon.nil? || @radius.nil?
-        "point_radius:[#{@lat} #{@lon} #{@radius}]" 
+        location = "point_radius:[#{@lat} #{@lon} #{@radius}]"
+        # prepend space for the rule if hashtags have been set
+        location.prepend(" ") if @hashtags.any?
+        location
       else
         ''
       end
     end
-    
+
     # Set Gnip rule variables to nil
     def set_rule_vars
-      # reset rule vars to nil 
+      # reset rule vars to nil
       @hashtags = []
       @lat = nil
       @lon = nil

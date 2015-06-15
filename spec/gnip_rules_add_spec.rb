@@ -14,31 +14,31 @@ describe Gnip::Ruler do
   context 'hashtag' do
     it 'will add hashtag to batch' do
       subject.hashtag('foo')
-      expect(subject.batch).to eq([{"value"=>"#foo ", "tag"=>nil}])
+      expect(subject.batch).to eq([{"value"=>"#foo", "tag"=>nil}])
     end
 
     it 'will add two hashtag to batch' do
       subject.hashtag('foo').hashtag('bar')
-      expect(subject.batch).to eq([{"value"=>"#bar #foo ", "tag"=>nil}])
+      expect(subject.batch).to eq([{"value"=>"#bar #foo", "tag"=>nil}])
     end
 
     it 'will add two hashtags and tag batch' do
       subject.hashtag('foo').hashtag('bar').tag('test-tag')
-      expect(subject.batch).to eq([{"value"=>"#bar #foo ", "tag"=>'test-tag'}])
+      expect(subject.batch).to eq([{"value"=>"#bar #foo", "tag"=>'test-tag'}])
     end
 
     it 'will not add same hashtag twice' do
       subject.hashtag('foo').hashtag('bar').hashtag('foo').tag('test-tag')
-      expect(subject.batch).to eq([{"value"=>"#bar #foo ", "tag"=>'test-tag'}])
+      expect(subject.batch).to eq([{"value"=>"#bar #foo", "tag"=>'test-tag'}])
     end
 
     it 'will add a second hashtag pair to batch' do
       subject.hashtag('foo').hashtag('bar').tag('test-tag')
-      expect(subject.batch).to eq([{"value"=>"#bar #foo ", "tag"=>'test-tag'}])
+      expect(subject.batch).to eq([{"value"=>"#bar #foo", "tag"=>'test-tag'}])
       subject.hashtag('baz').hashtag('biz').tag('biz-tag')
       expect(subject.batch).to eq([
-        {"value"=>"#bar #foo ", "tag"=>'test-tag'},
-        {"value"=>"#baz #biz ", "tag"=>'biz-tag'}])
+        {"value"=>"#bar #foo", "tag"=>'test-tag'},
+        {"value"=>"#baz #biz", "tag"=>'biz-tag'}])
     end
   end
 
@@ -52,8 +52,30 @@ describe Gnip::Ruler do
 
     it 'disregard case' do
       instance.hashtag('Foo').hashtag('bar').tag('footag')
-      expect(instance.batch).to eq ([{'value' => '#bar #foo ', 'tag' => 'footag'}])
+      expect(instance.batch).to eq ([{'value' => '#bar #foo', 'tag' => 'footag'}])
       expect(instance.add).to eq(true)
+    end
+  end
+
+  context "location" do
+    it 'hashtag and location' do
+      subject.hashtag('Foo').hashtag('bar').tag('footag').lat(123).lon(45).radius(0.01)
+      expect(subject.batch).to eq ([{"value"=>"#bar #foo point_radius:[123.0 45.0 0.01]", "tag"=>"footag"}])
+    end
+
+    it 'location and hashtag' do
+      subject.lat(123).lon(45).radius(0.01).hashtag('Foo').hashtag('bar').tag('footag')
+      expect(subject.batch).to eq ([{"value"=>"#bar #foo point_radius:[123.0 45.0 0.01]", "tag"=>"footag"}])
+    end
+
+    it 'location only' do
+      subject.lat(123).lon(45).radius(0.01).tag('footag')
+      expect(subject.batch).to eq ([{"value"=>"point_radius:[123.0 45.0 0.01]", "tag"=>"footag"}])
+    end
+
+    it 'hammajang order' do
+      subject.lat(123).hashtag('Foo').lon(45).hashtag('bar').tag('footag').radius(0.01)
+      expect(subject.batch).to eq ([{"value"=>"#bar #foo point_radius:[123.0 45.0 0.01]", "tag"=>"footag"}])
     end
 
   end
