@@ -40,6 +40,18 @@ describe Gnip::Ruler do
         {"value"=>"#bar #foo", "tag"=>'test-tag'},
         {"value"=>"#baz #biz", "tag"=>'biz-tag'}])
     end
+
+    it 'will not add empty hashtag' do
+      subject.hashtag('foo').hashtag('bar').tag('test-tag')
+      subject.hashtag('')
+      expect(subject.batch).to eq([{"value"=>"#bar #foo", "tag"=>'test-tag'}])
+    end
+
+    it 'will show the current pre-json batch' do
+      subject.hashtag('foo').hashtag('bar').tag('test-tag')
+      expect(subject.batch).to eq([{"value"=>"#bar #foo", "tag"=>'test-tag'}])
+      expect(subject.show).to eq([{"value"=>"#bar #foo", "tag"=>'test-tag'}])
+    end
   end
 
   context 'add hashtag rules' do

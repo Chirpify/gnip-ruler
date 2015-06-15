@@ -109,9 +109,18 @@ module Gnip
     #
     def batch
       # Add location rule, if set
-      @batch << { 'value' => hashtags_format_gnip << location_format_gnip, 'tag' => @tag }
+      unless hashtags_format_gnip.empty? && location_format_gnip.empty?
+        @batch << { 'value' => hashtags_format_gnip << location_format_gnip, 'tag' => @tag }
+      end
       # Reset gnip rule vars to defaults
       set_rule_vars
+      @batch
+    end
+
+    # Show current batch rule set. This is the pre-json rules we are submitting
+    # to Gnip.
+    #
+    def show
       @batch
     end
 
@@ -138,7 +147,9 @@ module Gnip
     #
     def hashtags_format_gnip
       gnip_rule = ''
-      @hashtags.uniq.sort_by{|h| h.downcase}.each{|h| gnip_rule << "##{h.downcase} " }
+      # remove dups(uniq), sort alphabetical, downcase, reject empty strings
+      # NOTE order and downcase make it easier to delete rules from Gnip
+      @hashtags.uniq.sort_by{|h| h.downcase}.reject{ |c| c.empty? }.each{|h| gnip_rule << "##{h.downcase} " }
       gnip_rule[0...-1]
     end
 
