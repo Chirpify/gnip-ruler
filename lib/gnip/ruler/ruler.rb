@@ -73,6 +73,18 @@ module Gnip
       @hashtags << arg
       self
     end
+    
+    def add_hashtags(params)
+      result = make_add_request(params)
+      reset
+      result
+    end
+    
+    def delete_hashtags(params)
+      result = make_delete_request(params)
+      reset
+      result
+    end
 
     # Add location data to the rule
     #
@@ -122,6 +134,10 @@ module Gnip
     #
     def show
       @batch
+    end
+    
+    def reset
+      @batch = []
     end
 
     # Send entire Gnip rule string (@batch) to Gnip

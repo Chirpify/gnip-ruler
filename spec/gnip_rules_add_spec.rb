@@ -7,7 +7,9 @@ describe Gnip::Ruler do
 
   context '#add' do
     it 'adds rules' do
-      expect(subject.make_add_request(rules_json)).to eq(true)
+      expect(subject.add_hashtags(rules_json)).to eq(true)
+      #should clear out queued up changes
+      expect(subject.batch).to be_empty
     end
   end
 
@@ -67,6 +69,12 @@ describe Gnip::Ruler do
       expect(instance.batch).to eq ([{'value' => '#bar #foo', 'tag' => 'footag'}])
       expect(instance.add).to eq(true)
     end
+    
+    it 'reset wipes out batch' do
+      instance.reset
+      expect(instance.batch).to be_empty
+    end
+    
   end
 
   context "location" do
