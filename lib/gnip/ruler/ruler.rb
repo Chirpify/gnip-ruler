@@ -76,13 +76,11 @@ module Gnip
     
     def add_hashtags(params)
       result = make_add_request(params)
-      reset
       result
     end
     
     def delete_hashtags(params)
       result = make_delete_request(params)
-      reset
       result
     end
 
@@ -137,6 +135,7 @@ module Gnip
     end
     
     def reset
+      puts "resetti"
       @batch = []
     end
 
@@ -165,7 +164,7 @@ module Gnip
       gnip_rule = ''
       # remove dups(uniq), sort alphabetical, downcase, reject empty strings
       # NOTE order and downcase make it easier to delete rules from Gnip
-      @hashtags.uniq.sort_by{|h| h.downcase}.reject{ |c| c.empty? }.each{|h| gnip_rule << "##{h.downcase} " }
+      @hashtags.uniq.reject{ |c| c.empty? }.each{|h| gnip_rule << "##{h.downcase} " }
       gnip_rule[0...-1]
     end
 
