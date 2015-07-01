@@ -135,7 +135,6 @@ module Gnip
     end
     
     def reset
-      puts "resetti"
       @batch = []
     end
 
