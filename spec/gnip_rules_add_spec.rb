@@ -97,7 +97,19 @@ describe Gnip::Ruler do
       subject.lat(123).hashtag('Foo').lon(45).hashtag('bar').tag('footag').radius(0.01)
       expect(subject.batch).to eq ([{"value"=>"#foo #bar point_radius:[123.0 45.0 0.01]", "tag"=>"footag"}])
     end
+  end
 
+  context 'places' do
+
+    it 'hashtag and place' do
+      subject.hashtag('Foo').hashtag('bar').tag('footag').place('abc123')
+      expect(subject.batch).to eq ([{"value"=>"#foo #bar place:abc123", "tag"=>"footag"}])
+    end
+
+    it 'place only' do
+      subject.place('123abc').tag('footag')
+      expect(subject.batch).to eq ([{"value"=>"place:123abc", "tag"=>"footag"}])
+    end
   end
 
 end

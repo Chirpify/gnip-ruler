@@ -23,6 +23,12 @@ describe Gnip::Ruler do
         {'value' => '#biz #boz #fuz', 'tag' => nil}])
       expect(instance.delete).to eq(true)
     end
+
+    it 'deletes place rule' do
+      instance.hashtag('foo').hashtag('bar').hashtag('baz').place('abc123')
+      expect(instance.batch).to eq([{'value' => '#foo #bar #baz place:abc123', "tag" => nil}])
+      expect(instance.delete).to eq(true)
+    end
   end
 
 end
