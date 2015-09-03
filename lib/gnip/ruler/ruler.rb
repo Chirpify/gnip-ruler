@@ -35,7 +35,7 @@ require "json"
 # ruler.tag('this is a tag')
 # # add optional location
 # ruler.location.lat('123')
-# ruler.location.lon('45')
+# ruler.location.long('45')
 # ruler.location.rad('0.01')
 # # add rule to batch(adds to master queue array!)
 # ruler.batch
@@ -68,7 +68,7 @@ module Gnip
     include Gnip::Request
 
     attr_reader :uri, :url, :password, :username
-    attr_reader :hashtags, :batch, :locations, :lat, :lon, :places, :radius, :tag
+    attr_reader :hashtags, :batch, :locations, :lat, :long, :places, :radius, :tag
 
     def initialize (url, username, password)
       @uri = URI.parse(url)
@@ -104,8 +104,8 @@ module Gnip
       self
     end
 
-    def lon(arg)
-      @lon = arg.to_f
+    def long(arg)
+      @long = arg.to_f
       self
     end
 
@@ -183,12 +183,12 @@ module Gnip
       gnip_rule[0...-1]
     end
 
-    # Generate location string for Gnip rules if lat, lon, and radius are set
+    # Generate location string for Gnip rules if lat, long, and radius are set
     # else return empty string
     #
     def location_format_gnip
-      unless @lat.nil? || @lon.nil? || @radius.nil?
-        location = "point_radius:[#{@lat} #{@lon} #{@radius}]"
+      unless @lat.nil? || @long.nil? || @radius.nil?
+        location = "point_radius:[#{@long} #{@lat} #{@radius}]"
         # prepend space for the rule if hashtags have been set
         location.prepend(" ") if @hashtags.any?
         location
@@ -218,7 +218,7 @@ module Gnip
       @hashtags = []
       @places = []
       @lat = nil
-      @lon = nil
+      @long = nil
       @radius = nil
       @tag = nil
     end

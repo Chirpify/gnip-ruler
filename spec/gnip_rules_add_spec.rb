@@ -7,7 +7,7 @@ describe Gnip::Ruler do
 
   context '#add' do
     it 'adds rules' do
-      expect(subject.add_hashtags(rules_json)).to eq(true)
+      expect(subject.add_rules(rules_json)).to eq(true)
       #should clear out queued up changes
       expect(subject.batch).to be_empty
     end
@@ -79,23 +79,23 @@ describe Gnip::Ruler do
 
   context "location" do
     it 'hashtag and location' do
-      subject.hashtag('Foo').hashtag('bar').tag('footag').lat(123).lon(45).radius(0.01)
-      expect(subject.batch).to eq ([{"value"=>"#foo #bar point_radius:[123.0 45.0 0.01]", "tag"=>"footag"}])
+      subject.hashtag('Foo').hashtag('bar').tag('footag').lat(123).long(45).radius(0.01)
+      expect(subject.batch).to eq ([{"value"=>"#foo #bar point_radius:[45.0 123.0 0.01]", "tag"=>"footag"}])
     end
 
     it 'location and hashtag' do
-      subject.lat(123).lon(45).radius(0.01).hashtag('Foo').hashtag('bar').tag('footag')
-      expect(subject.batch).to eq ([{"value"=>"#foo #bar point_radius:[123.0 45.0 0.01]", "tag"=>"footag"}])
+      subject.lat(123).long(45).radius(0.01).hashtag('Foo').hashtag('bar').tag('footag')
+      expect(subject.batch).to eq ([{"value"=>"#foo #bar point_radius:[45.0 123.0 0.01]", "tag"=>"footag"}])
     end
 
     it 'location only' do
-      subject.lat(123).lon(45).radius(0.01).tag('footag')
-      expect(subject.batch).to eq ([{"value"=>"point_radius:[123.0 45.0 0.01]", "tag"=>"footag"}])
+      subject.lat(123).long(45).radius(0.01).tag('footag')
+      expect(subject.batch).to eq ([{"value"=>"point_radius:[45.0 123.0 0.01]", "tag"=>"footag"}])
     end
 
     it 'hammajang order' do
-      subject.lat(123).hashtag('Foo').lon(45).hashtag('bar').tag('footag').radius(0.01)
-      expect(subject.batch).to eq ([{"value"=>"#foo #bar point_radius:[123.0 45.0 0.01]", "tag"=>"footag"}])
+      subject.lat(123).hashtag('Foo').long(45).hashtag('bar').tag('footag').radius(0.01)
+      expect(subject.batch).to eq ([{"value"=>"#foo #bar point_radius:[45.0 123.0 0.01]", "tag"=>"footag"}])
     end
   end
 
