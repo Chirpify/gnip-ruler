@@ -68,7 +68,7 @@ module Gnip
     include Gnip::Request
 
     attr_reader :uri, :url, :password, :username
-    attr_reader :hashtags, :batch, :locations, :lat, :long, :places, :radius, :tag
+    attr_reader :hashtags, :batch, :locations, :lat, :lon, :places, :radius, :tag
 
     def initialize (url, username, password)
       @uri = URI.parse(url)
