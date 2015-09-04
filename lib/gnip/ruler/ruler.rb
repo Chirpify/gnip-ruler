@@ -112,7 +112,7 @@ module Gnip
     # Miles
     #
     def radius(arg)
-      @radius = arg.to_f
+      @radius = arg
       self
     end
 
