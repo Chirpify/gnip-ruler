@@ -10,7 +10,7 @@ describe Gnip::Ruler do
 
     it 'deletes rule' do
       instance.hashtag('foo').hashtag('bar').hashtag('baz')
-      expect(instance.batch).to eq([{'value' => '#bar #baz #foo', "tag" => nil}])
+      expect(instance.batch).to eq([{'value' => '#foo #bar #baz', "tag" => nil}])
       expect(instance.delete).to eq(true)
     end
 
@@ -19,8 +19,14 @@ describe Gnip::Ruler do
       instance.batch
       instance.hashtag('biz').hashtag('boz').hashtag('fuz')
       expect(instance.batch).to eq([
-        {'value' => '#bar #baz #foo', 'tag' => nil},
+        {'value' => '#foo #bar #baz', 'tag' => nil},
         {'value' => '#biz #boz #fuz', 'tag' => nil}])
+      expect(instance.delete).to eq(true)
+    end
+
+    it 'deletes place rule' do
+      instance.hashtag('foo').hashtag('bar').hashtag('baz').place('abc123')
+      expect(instance.batch).to eq([{'value' => '#foo #bar #baz place:abc123', "tag" => nil}])
       expect(instance.delete).to eq(true)
     end
   end

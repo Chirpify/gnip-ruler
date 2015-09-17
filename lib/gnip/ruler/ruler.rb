@@ -35,12 +35,21 @@ require "json"
 # ruler.tag('this is a tag')
 # # add optional location
 # ruler.location.lat('123')
-# ruler.location.lon('45')
+# ruler.location.long('45')
 # ruler.location.rad('0.01')
 # # add rule to batch(adds to master queue array!)
 # ruler.batch
 # # produces rule: {'value':'#bar #foo point_radius:[123 45 0.01]', 'tag':'this is a tag'}
-# # go again
+# # rule to get all tweets with twitter place id
+# ruler.place('07d9d783adc83002')
+# ruler.tag('twitter place id')
+# ruler.batch
+# # produces rule: {'value':'place:07d9d783adc83002', 'tag':'twitter place id'}
+# # rule to get all tweets with twitter place id and hashtags
+# ruler.place('07d9d783adc83002').hashtag('foo').hashtag('bar')
+# ruler.tag('twitter place id and hashtags')
+# ruler.batch
+# # produces rule: {'value':'#foo #bar place:07d9d783adc83002', 'tag':'twitter place id'}
 # # ...
 # # send queued rules to Gnip
 # ruler.add
@@ -59,7 +68,7 @@ module Gnip
     include Gnip::Request
 
     attr_reader :uri, :url, :password, :username
-    attr_reader :hashtags, :batch, :locations, :lat, :long, :radius, :tag
+    attr_reader :hashtags, :batch, :locations, :lat, :long, :places, :radius, :tag
 
     def initialize (url, username, password)
       @uri = URI.parse(url)
@@ -73,13 +82,13 @@ module Gnip
       @hashtags << arg
       self
     end
-    
-    def add_hashtags(params)
+
+    def add_rules(params)
       result = make_add_request(params)
       result
     end
     
-    def delete_hashtags(params)
+    def delete_rules(params)
       result = make_delete_request(params)
       result
     end
@@ -95,18 +104,25 @@ module Gnip
       self
     end
 
-    def lon(arg)
-      @lon = arg.to_f
+    def long(arg)
+      @long = arg.to_f
       self
     end
 
     # Miles
     #
     def radius(arg)
-      @radius = arg.to_f
+      @radius = arg
       self
     end
 
+    # Add place ids to rules
+    #
+    def place( id )
+      @places << id
+      self
+    end
+    
     # Add tag to gnip rule
     #
     def tag(arg)
@@ -119,8 +135,8 @@ module Gnip
     #
     def batch
       # Add location rule, if set
-      unless hashtags_format_gnip.empty? && location_format_gnip.empty?
-        @batch << { 'value' => hashtags_format_gnip << location_format_gnip, 'tag' => @tag }
+      unless hashtags_format_gnip.empty? && location_format_gnip.empty? && places_format_gnip.empty?
+        @batch << { 'value' => hashtags_format_gnip << location_format_gnip << places_format_gnip, 'tag' => @tag }
       end
       # Reset gnip rule vars to defaults
       set_rule_vars
@@ -141,13 +157,13 @@ module Gnip
     # Send entire Gnip rule string (@batch) to Gnip
     #
     def add
-      make_add_request @batch
+      make_add_request @batch.to_json
     end
 
     # Send entire Gnip rule string (@batch) to Gnip
     #
     def delete
-      make_delete_request @batch
+      make_delete_request @batch.to_json
     end
 
     #
@@ -161,21 +177,36 @@ module Gnip
     #
     def hashtags_format_gnip
       gnip_rule = ''
-      # remove dups(uniq), sort alphabetical, downcase, reject empty strings
-      # NOTE order and downcase make it easier to delete rules from Gnip
+      # remove dups(uniq), downcase, reject empty strings
+      # NOTE downcase make it easier to delete rules from Gnip
       @hashtags.uniq.reject{ |c| c.empty? }.each{|h| gnip_rule << "##{h.downcase} " }
       gnip_rule[0...-1]
     end
 
-    # Generate location string for Gnip rules if lat, lon, and radius are set
+    # Generate location string for Gnip rules if lat, long, and radius are set
     # else return empty string
     #
     def location_format_gnip
-      unless @lat.nil? || @lon.nil? || @radius.nil?
-        location = "point_radius:[#{@lat} #{@lon} #{@radius}]"
+      unless @lat.nil? || @long.nil? || @radius.nil?
+        location = "point_radius:[#{@long} #{@lat} #{@radius}]"
         # prepend space for the rule if hashtags have been set
         location.prepend(" ") if @hashtags.any?
         location
+      else
+        ''
+      end
+    end
+
+    # Generate places string for the Gnip rules.
+    #
+    def places_format_gnip
+      place_string = ''
+      unless @places.nil?
+        @places.each do |place|
+          place_string = "place:#{place}"
+          place_string.prepend(" ") if @hashtags.any?
+        end
+        place_string
       else
         ''
       end
@@ -185,8 +216,9 @@ module Gnip
     def set_rule_vars
       # reset rule vars to nil
       @hashtags = []
+      @places = []
       @lat = nil
-      @lon = nil
+      @long = nil
       @radius = nil
       @tag = nil
     end
