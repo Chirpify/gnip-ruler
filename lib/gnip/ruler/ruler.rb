@@ -71,6 +71,7 @@ module Gnip
     attr_reader :hashtags, :batch, :locations, :lat, :long, :places, :radius, :tag
 
     def initialize (url, username, password)
+      @url = url
       @uri = URI.parse(url)
       @username = username
       @password = password

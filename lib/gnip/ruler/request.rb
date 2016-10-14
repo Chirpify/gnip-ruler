@@ -1,3 +1,4 @@
+require 'base64'
 module Gnip
   module Request
     def http
@@ -26,10 +27,17 @@ module Gnip
     # Make a DELETE request to the Gnip Rules API
     #
     def request_delete(json_rules)
-      delete = Net::HTTP::Delete.new(uri.path)
-      delete.body = json_rules
-      delete.basic_auth(username, password)
-      http.request(delete)
+      url_with_delete = "#{@url}?_method=delete"
+      payload = json_rules
+      response = RestClient.post(url_with_delete, payload, {:Authorization => form_auth_header}) 
+      response
     end
+    
+    def form_auth_header
+      raw = "#{username}:#{password}"
+      encoded = Base64.encode64(raw)
+      "Basic #{encoded}"
+    end
+    
   end
 end
