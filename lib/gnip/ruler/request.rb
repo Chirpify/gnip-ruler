@@ -1,4 +1,5 @@
 require 'base64'
+require 'rest-client'
 module Gnip
   module Request
     def http
