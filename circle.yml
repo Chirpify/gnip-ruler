@@ -1,0 +1,7 @@
+machine:
+  ruby:
+    version: 2.1.2
+dependencies:
+test:
+  override:
+    - bundle exec rspec spec --format progress
