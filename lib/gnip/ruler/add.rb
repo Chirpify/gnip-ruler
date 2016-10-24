@@ -14,7 +14,7 @@ module Gnip
         sleep 5
         response = request_post(rules)
       end
-      return true if response.code == "201"
+      return true if response.code.to_s == "201"
       false
     end
 

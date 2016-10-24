@@ -1,65 +1,11 @@
 ---
 http_interactions:
 - request:
-    method: get
-    uri: https://username:password@api.gnip.com/accounts/foo/publishers/twitter/streams/track/dev/rules.json
-    body:
-      encoding: US-ASCII
-      string: ''
-    headers:
-      Accept-Encoding:
-      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
-      Accept:
-      - "*/*"
-      User-Agent:
-      - Ruby
-  response:
-    status:
-      code: 200
-      message: OK
-    headers:
-      Content-Type:
-      - application/json
-      Content-Length:
-      - '12'
-    body:
-      encoding: UTF-8
-      string: '{"rules":[]}'
-    http_version: 
-  recorded_at: Wed, 10 Jun 2015 18:59:18 GMT
-- request:
-    method: get
-    uri: https://username:password@api.gnip.com/accounts/foo/publishers/twitter/streams/track/dev/rules.json
-    body:
-      encoding: US-ASCII
-      string: ''
-    headers:
-      Accept-Encoding:
-      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
-      Accept:
-      - "*/*"
-      User-Agent:
-      - Ruby
-  response:
-    status:
-      code: 200
-      message: OK
-    headers:
-      Content-Type:
-      - application/json
-      Content-Length:
-      - '12'
-    body:
-      encoding: UTF-8
-      string: '{"rules":[]}'
-    http_version: 
-  recorded_at: Wed, 10 Jun 2015 18:59:19 GMT
-- request:
     method: post
-    uri: https://username:password@api.gnip.com/accounts/foo/publishers/twitter/streams/track/dev/rules.json
+    uri: https://noneya/rules/powertrack/accounts/business/publishers/twitter/Development.json
     body:
       encoding: UTF-8
-      string: '{"rules":[{"value":"#bar #foo","tag":"footag"}]}'
+      string: '{ "rules": [{"value":"#foo #bar","tag":"footag"}] }'
     headers:
       Accept-Encoding:
       - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
@@ -67,18 +13,36 @@ http_interactions:
       - "*/*"
       User-Agent:
       - Ruby
+      Authorization:
+      - Basic some auth header
   response:
     status:
       code: 201
       message: Created
     headers:
-      Content-Type:
-      - application/json
       Content-Length:
-      - '0'
+      - '160'
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Mon, 24 Oct 2016 21:11:17 GMT
+      Server:
+      - tsa_a
+      Set-Cookie:
+      - guest_id=v1%3A147734347689771347; Domain=.twitter.com; Path=/; Expires=Wed,
+        24-Oct-2018 21:11:17 UTC
+      Strict-Transport-Security:
+      - max-age=631138519
+      X-Connection-Hash:
+      - f7e6cfe26bd72e12d9bc85f48fd47742
+      X-Response-Time:
+      - '261'
+      X-Tsa-Request-Body-Time:
+      - '64'
     body:
       encoding: UTF-8
-      string: ''
+      string: '{"summary":{"created":1,"not_created":0},"detail":[{"rule":{"value":"#foo
+        #bar","tag":"footag","id":790661965806837760},"created":true}],"sent":"2016-10-24T21:11:17.155Z"}'
     http_version: 
-  recorded_at: Wed, 10 Jun 2015 18:59:21 GMT
+  recorded_at: Mon, 24 Oct 2016 21:11:17 GMT
 recorded_with: VCR 2.9.3

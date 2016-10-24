@@ -2,7 +2,7 @@
 http_interactions:
 - request:
     method: get
-    uri: https://username:password@api.gnip.com/accounts/foo/publishers/twitter/streams/track/dev/rules.json
+    uri: https://noneya/rules/powertrack/accounts/business/publishers/twitter/Development.json
     body:
       encoding: US-ASCII
       string: ''
@@ -13,18 +13,33 @@ http_interactions:
       - "*/*"
       User-Agent:
       - Ruby
+      Authorization:
+      - Basic some auth header
   response:
     status:
       code: 200
       message: OK
     headers:
       Content-Type:
-      - application/json
-      Content-Length:
-      - '12'
+      - application/json;charset=utf-8
+      Date:
+      - Mon, 24 Oct 2016 21:25:42 GMT
+      Server:
+      - tsa_a
+      Set-Cookie:
+      - guest_id=v1%3A147734434280483869; Domain=.twitter.com; Path=/; Expires=Wed,
+        24-Oct-2018 21:25:42 UTC
+      Strict-Transport-Security:
+      - max-age=631138519
+      Transfer-Encoding:
+      - chunked
+      X-Connection-Hash:
+      - bf06989312d81dc2f0ecf81755dca644
+      X-Response-Time:
+      - '132'
     body:
       encoding: UTF-8
-      string: '{"rules":[{"value":"#foo #bar","tag":null}]}'
+      string: '{"rules":[{"value":"#foo #bar","tag":null,"id":790665551764795393}],"sent":"2016-10-24T21:25:42.933Z"}'
     http_version: 
-  recorded_at: Tue, 09 Jun 2015 23:35:49 GMT
+  recorded_at: Mon, 24 Oct 2016 21:25:42 GMT
 recorded_with: VCR 2.9.3
