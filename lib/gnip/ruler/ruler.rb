@@ -143,6 +143,12 @@ module Gnip
       set_rule_vars
       @batch
     end
+    
+    def manual_batch(topic)
+      @batch << { 'value' => topic, 'tag' => 'ENV:staging:HID:3'}
+      set_rule_vars
+      @batch
+    end
 
     # Show current batch rule set. This is the pre-json rules we are submitting
     # to Gnip.
