@@ -144,8 +144,8 @@ module Gnip
       @batch
     end
     
-    def manual_batch(topic)
-      @batch << { 'value' => topic, 'tag' => 'ENV:staging:HID:3'}
+    def add_full_gnip_rule(topic, tag)
+      @batch << { 'value' => topic, 'tag' => tag}
       set_rule_vars
       @batch
     end

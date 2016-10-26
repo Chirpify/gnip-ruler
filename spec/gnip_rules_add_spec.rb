@@ -74,7 +74,14 @@ describe Gnip::Ruler do
       instance.reset
       expect(instance.batch).to be_empty
     end
-    
+  end
+  
+  context 'add full gnip rule' do
+    let(:instance) {base.new url, user, pass}
+    it 'should should work' do 
+      instance.add_full_gnip_rule('a super cool rule', 'ENV:staging:HID:3')
+      expect(instance.batch).to eq ([{'value' => 'a super cool rule', 'tag' => 'ENV:staging:HID:3'}])
+    end
   end
 
   context "location" do
