@@ -7,8 +7,7 @@ module Gnip
     def list_current_rules
       begin
         response = request_get
-      rescue
-        sleep 5
+      rescue Exception => e
         response = request_get
       end
       return [] if response.body.nil?

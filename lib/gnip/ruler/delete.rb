@@ -10,13 +10,12 @@ module Gnip
     def make_delete_request(arg)
       rules = "{ \"rules\": #{arg} }"
       begin
-          response = request_delete(rules)
+        response = request_delete(rules)
       rescue
-          sleep 5
-          response = request_delete(rules)
+        sleep 5
+        response = request_delete(rules)
       end
-
-      return true if response.code == "200"
+      return true if response.code.to_s == "200"
       false
     end
   end

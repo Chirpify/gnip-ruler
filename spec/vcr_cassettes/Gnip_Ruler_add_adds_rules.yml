@@ -2,10 +2,10 @@
 http_interactions:
 - request:
     method: post
-    uri: https://username:password@api.gnip.com/accounts/foo/publishers/twitter/streams/track/dev/rules.json
+    uri: https://noneya/rules/powertrack/accounts/business/publishers/twitter/Development.json
     body:
       encoding: UTF-8
-      string: '{"rules":[{"value":"(gnip OR \"this exact phrase\") country_code:us","tag":"mytag"}]}'
+      string: '{ "rules": [{"value":"#someballerhashtag","tag":"mytag"}] }'
     headers:
       Accept-Encoding:
       - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
@@ -13,20 +13,35 @@ http_interactions:
       - "*/*"
       User-Agent:
       - Ruby
+      Authorization:
+      - Basic some auth header
   response:
     status:
       code: 201
       message: Created
     headers:
-      Content-Type:
-      - application/json
-      Www-Authenticate:
-      - Basic realm="Web Password"
       Content-Length:
-      - '0'
+      - '162'
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Mon, 24 Oct 2016 21:11:16 GMT
+      Server:
+      - tsa_a
+      Set-Cookie:
+      - guest_id=v1%3A147734347590702700; Domain=.twitter.com; Path=/; Expires=Wed,
+        24-Oct-2018 21:11:16 UTC
+      Strict-Transport-Security:
+      - max-age=631138519
+      X-Connection-Hash:
+      - c4a09d10a23adc75fac3da99df2ffb44
+      X-Response-Time:
+      - '236'
+      X-Tsa-Request-Body-Time:
+      - '69'
     body:
       encoding: UTF-8
-      string: ''
+      string: '{"summary":{"created":1,"not_created":0},"detail":[{"rule":{"value":"#someballerhashtag","tag":"mytag","id":790661961553883136},"created":true}],"sent":"2016-10-24T21:11:16.140Z"}'
     http_version: 
-  recorded_at: Mon, 15 Jun 2015 05:19:06 GMT
+  recorded_at: Mon, 24 Oct 2016 21:11:16 GMT
 recorded_with: VCR 2.9.3
