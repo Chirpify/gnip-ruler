@@ -11,7 +11,7 @@ describe Gnip::Ruler do
 
   context '#list' do
     it 'gets a list of current rules' do
-      expect(subject.list).to eq([{"value"=>"#foo #bar", "tag"=>nil}])
+      expect(subject.list.first.to_json).to include "#foo #bar"
     end
   end
   context '#list' do
