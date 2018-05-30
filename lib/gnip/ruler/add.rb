@@ -8,12 +8,16 @@ module Gnip
     def make_add_request(arg)
       # Attempt to update the Gnip rule set
       rules = "{ \"rules\": #{arg} }"
+      puts "Submitting to Rules Endpoint The Following: ==>"
+      puts rules
       begin
         response = request_post(rules)
       rescue
         sleep 5
         response = request_post(rules)
       end
+      puts "Response From Gnip Was =====>"
+      puts response
       return true if response.code.to_s == "201"
       false
     end
